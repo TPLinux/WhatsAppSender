@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Whatsapp Sender</title>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+	<style>
+	 #lists-cont{
+	     display: flex;
+	 }
+	 #lists-cont > div{
+	     margin: 10px;
+	 }
+	 #lists-cont textarea{
+	     width: 20vw;
+	     height: 30vh;
+	     resize: none;
+	 }
+
+	 form textarea{
+	     width: 20vw;
+	     height: 30vh;
+	     resize: none;
+	 }
+	 .btns{
+	     min-width: 100px;
+	     padding: 10px;
+	     border: 0px;
+	     cursor: pointer;
+	     color: white;
+	     font-weight: bold;
+	 }
+	 .orange{
+	     background-color: orange;
+	 }
+	 .red{
+	     background-color: #ce3939;
+	 }
+	 .green{
+	     background-color: #45744b;
+	 }
+	</style>
+    </head>
+
+    <body>
+	<h1>Whats App sender SX Max Pro Shorom Borom Mate 10 Lite IV</h1>
+	<input type="submit" class="btns orange" value="CLEAR LOG FILE" onclick="clearLog()" />
+	<form method="post">
+	    <p>Delay From (Seconds)</p>
+	    <input name="delay_from" type="number" value="{{delay[0]}}" min="40" step="1" />
+	    <p>Delay To (Seconds)</p>
+	    <input name="delay_to" type="number" value="{{delay[1]}}" min="50" step="1" />
+	    <p>Message</p>
+	    <textarea name="msg">{% if msg and msg != '' %}{{msg}}{% endif %}{% if not msg %}Welcome {name} in our company{% endif %}</textarea>
+	    <p>Image Full Path (Leave it empty if you want to send text only)</p>
+	    <input name="image" type="text" value="{{image}}" />
+	    <p>
+		<input type="submit" name="save" class="btns green" value="SAVE FIELDS" />
+	    </p>
+	    <div id='lists-cont'>
+		<div>
+		    <p>Phones List</p>
+		    <textarea name="phones">{% if phones and phones != '' %}{{phones}}{% endif %}</textarea>
+		</div>
+		<div>
+		    <p>Names List</p>
+		    <textarea name="names">{% if names and names != '' %}{{names}}{% endif %}</textarea>
+		</div>
+		<div>
+		    <p>Log</p>
+		    <textarea id="log" readonly></textarea>
+		</div>
+	    </div>
+	    <script>
+	     function clearLog(){
+		 $.get('/clear-log', function(log){
+		     alert('Log deleted !');
+		     getLog();
+		 });
+	     }
+	     function getLog(){
+		 $.get('/log', function(log){
+		     $('#log').val(log.trim());
+		 });
+	     }
+	     function checkStatus(){
+		 $.get('/check', function(status){
+		     if(status.trim() == 'no'){
+			 clearInterval(window.interval);
+			 window.location.href = '/';
+		     }
+		 });
+	     }
+	     getLog();
+	    </script>
+	    <p>
+		{% if started == 'no' or started == ''%}
+		<input type="submit" name="start" class="btns green" value="start" />
+		<script>
+		 if(window.interval){
+		     clearInterval(window.interval);
+		 }
+		</script>
+		{% endif %}
+		{% if started == 'yes'%}
+		<script>
+		 getLog()
+		 window.interval = setInterval(() => {
+		     getLog()
+		     checkStatus()
+		 }, 5000)
+		</script>
+		<input type="submit" name="stop" class="btns red" value="stop" />
+		{% endif %}
+	    </p>
+	</form>
+    </body>
+</html>
